@@ -981,6 +981,10 @@ static void xfer_secondary_pool(struct entropy_store *r, size_t nbytes)
 	    r->entropy_count > r->poolinfo->poolfracbits)
 		return;
 
+	/* Only attempt to rate limit transfers of entropy if we're initialized.
+	   Until we are initialized it makes sense to transfer all the entropy we
+	   can.
+	 */
 	if (r->limit == 0 && r->initialized && random_min_urandom_seed) {
 		unsigned long now = jiffies;
 
