@@ -1951,6 +1951,32 @@ config PROFILING
 config TRACEPOINTS
 	bool
 
+config HAS_RUST
+  def_bool $(success,rustc --version)
+
+config HAS_CARGO
+  def_bool $(success,cargo --version)
+
+config MENU_RUST
+  bool "Enables building kernel modules written in Rust"
+  depends on HAS_RUST
+  depends on HAS_CARGO
+  help
+    Whether to support building modules written in Rust.
+
+config RUST_DISABLE
+        bool
+        depends on RUST_MENU
+        help
+          This option disables the support for Rust, so that make
+          allyesconfig and make allmodconfig will not enable it. To
+          build modules written in Rust, leave this option set to 'n'.
+
+config RUST
+        bool
+        default y
+        depends on RUST_MENU && !RUST_DISABLE
+
 endmenu		# General setup
 
 source "arch/Kconfig"

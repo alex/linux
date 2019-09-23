@@ -283,6 +283,19 @@ quiet_cmd_cc_lst_c = MKLST   $@
 $(obj)/%.lst: $(src)/%.c FORCE
 	$(call if_changed_dep,cc_lst_c)
 
+# Compile Rust sources
+# --------------------
+
+ifdef CONFIG_RUST
+CARGO ?= cargo
+
+# TODO: release/debug
+$(obj)/%.rust.o: $(src)/Cargo.toml $(src)/Cargo.lock $(wildcard $(src)/src/*.rs) FORCE
+	cd $(src); env -u MAKE -u MAKEFLAGS KDIR="$(CURDIR)/$(srctree)" $(CARGO) build -Z build-std=core,alloc --target=$(CONFIG_ARCH_RUST_TARGET)
+	$(LD) -r -o $@ --whole-archive $(src)/target/$(CONFIG_ARCH_RUST_TARGET)/debug/lib$(patsubst %.rust.o,%.a,$(@F))
+
+endif
+
 # header test (header-test-y, header-test-m target)
 # ---------------------------------------------------------------------------
 
